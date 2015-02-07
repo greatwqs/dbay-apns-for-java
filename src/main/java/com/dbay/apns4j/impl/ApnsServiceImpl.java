@@ -15,6 +15,10 @@
  */
 package com.dbay.apns4j.impl;
 
+import static com.dbay.apns4j.model.ApnsConstants.ALGORITHM;
+import static com.dbay.apns4j.model.ApnsConstants.KEYSTORE_TYPE;
+import static com.dbay.apns4j.model.ApnsConstants.PROTOCOL;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -26,8 +30,6 @@ import javax.net.SocketFactory;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
-import static com.dbay.apns4j.model.ApnsConstants.*;
 
 import com.dbay.apns4j.IApnsConnection;
 import com.dbay.apns4j.IApnsFeedbackConnection;

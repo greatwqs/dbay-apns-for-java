@@ -33,6 +33,7 @@ import org.apache.commons.logging.LogFactory;
 
 import static com.dbay.apns4j.model.ApnsConstants.*;
 
+import com.dbay.apns4j.ApnsDelegate;
 import com.dbay.apns4j.IApnsConnection;
 import com.dbay.apns4j.model.Command;
 import com.dbay.apns4j.model.ErrorResponse;
@@ -41,8 +42,11 @@ import com.dbay.apns4j.model.PushNotification;
 import com.dbay.apns4j.tools.ApnsTools;
 
 /**
+ * Add simple ApnsDelegate delegate;
+ * to make sure sendfailed to notify;
+ * 
  * @author RamosLi
- *
+ * @author greatwqs
  */
 public class ApnsConnectionImpl implements IApnsConnection {
 	
@@ -94,12 +98,15 @@ public class ApnsConnectionImpl implements IApnsConnection {
 	private int intervalTime;
 	private long lastSuccessfulTime = 0;
 	
+	/** greatwqs updated ApnsDelegate **/
+	private final ApnsDelegate delegate;
+	
 	private AtomicInteger notificaionSentCount = new AtomicInteger(0);
 	
 	private Object lock = new Object();
 	
 	public ApnsConnectionImpl(SocketFactory factory, String host, int port, int maxRetries, 
-			int maxCacheLength, String name, String connName, int intervalTime, int timeout) {
+			int maxCacheLength, String name, String connName, int intervalTime, int timeout, ApnsDelegate delegate) {
 		this.factory = factory;
 		this.host = host;
 		this.port = port;
@@ -109,6 +116,8 @@ public class ApnsConnectionImpl implements IApnsConnection {
 		this.connName = connName;
 		this.intervalTime = intervalTime;
 		this.readTimeOut = timeout;
+		// greatwqs updated for ApnsDelegate;
+		this.delegate = delegate == null ? ApnsDelegate.EMPTY : delegate;
 	}
 	
 	@Override
@@ -202,7 +211,7 @@ public class ApnsConnectionImpl implements IApnsConnection {
 			 * CN: createSocket时只建立了TCP连接，还没有进行SSL认证，第一次写完数据后才真正完成认证。所以此时才开始
 			 *     监听InputStream
 			 */
-			startErrorWorker();
+			startErrorWorker(notification);
 		}
 	}
 	private Socket createNewSocket() throws IOException, UnknownHostException {
@@ -239,7 +248,7 @@ public class ApnsConnectionImpl implements IApnsConnection {
 		closeSocket(socket);
 	}
 	
-	private void startErrorWorker() {
+	private void startErrorWorker(final PushNotification notification) {
 		Thread thread = new Thread(new Runnable() {
 
 			@Override
@@ -276,6 +285,9 @@ public class ApnsConnectionImpl implements IApnsConnection {
 						if (logger.isInfoEnabled()) {
 							logger.info(String.format("%s Received error response. status: %s, id: %s, error-desc: %s", connName, status, errorId, ErrorResponse.desc(status)));
 						}
+						
+						// greatwqs update ApnsDelegate
+						delegate.messageSendFailed(notification, res);
 						
 						Queue<PushNotification> resentQueue = new LinkedList<PushNotification>();
 

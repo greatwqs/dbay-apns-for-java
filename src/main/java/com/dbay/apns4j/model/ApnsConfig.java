@@ -17,9 +17,11 @@ package com.dbay.apns4j.model;
 
 import java.io.InputStream;
 
+import com.dbay.apns4j.ApnsDelegate;
+
 /**
  * @author RamosLi
- *
+ * @author greatwqs
  */
 public class ApnsConfig {
 	private String name;
@@ -61,6 +63,9 @@ public class ApnsConfig {
 	
 	// socket read timeout
 	private int timeout = 10 * 1000; // 10 seconds
+	
+	// greatwqs add default delegate;
+	private ApnsDelegate delegate = ApnsDelegate.EMPTY;
 	
 	public InputStream getKeyStore() {
 		return keyStore;
@@ -135,5 +140,13 @@ public class ApnsConfig {
 
 	public void setTimeout(int timeout) {
 		this.timeout = timeout;
+	}
+
+	public ApnsDelegate getDelegate() {
+		return delegate;
+	}
+
+	public void setDelegate(ApnsDelegate delegate) {
+		this.delegate = delegate;
 	}
 }

@@ -15,6 +15,11 @@
  */
 package com.dbay.apns4j.impl;
 
+import static com.dbay.apns4j.model.ApnsConstants.HOST_DEVELOPMENT_ENV;
+import static com.dbay.apns4j.model.ApnsConstants.HOST_PRODUCTION_ENV;
+import static com.dbay.apns4j.model.ApnsConstants.PORT_DEVELOPMENT_ENV;
+import static com.dbay.apns4j.model.ApnsConstants.PORT_PRODUCTION_ENV;
+
 import java.io.Closeable;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -24,11 +29,10 @@ import javax.net.SocketFactory;
 import com.dbay.apns4j.IApnsConnection;
 import com.dbay.apns4j.model.ApnsConfig;
 
-import static com.dbay.apns4j.model.ApnsConstants.*;
-
 /**
  * 
  * @author RamosLi
+ * @author greatwqs
  *
  */
 public class ApnsConnectionPool implements Closeable {
@@ -52,7 +56,8 @@ public class ApnsConnectionPool implements Closeable {
 		for (int i = 0; i < poolSize; i++) {
 			String connName = (config.isDevEnv() ? "dev-" : "pro-") + CONN_ID_SEQ++;
 			IApnsConnection conn = new ApnsConnectionImpl(this.factory, host, port, config.getRetries(), 
-					config.getCacheLength(), config.getName(), connName, config.getIntervalTime(), config.getTimeout());
+					config.getCacheLength(), config.getName(), connName, 
+					config.getIntervalTime(), config.getTimeout(), config.getDelegate());
 			connQueue.add(conn);
 		}
 	}
